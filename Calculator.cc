@@ -5,9 +5,31 @@
 
 using namespace std;
 
+// Note - "Any name consisting of alphanumeric characters should be allowed as
+// register names" in instructions given by Sectra causes undefined behaviour.
+// What happens below?
+//
+//      123 add 5
+//      123 add 123
+//      print 123
+//
+// Does it print 10? 128? Should it just crash because of circular dependency 
+// for register 123? 
+
 void Calculator::run(istream& is)
 {
-    string input{};
+    string strInput;
+    double numInput;
+
+    while (not is.EOF())
+    {
+        if (is >> numInput)
+        {
+            throw runtime_error("No numbers allowed in 
+        };
+    };
+
+
     while (is >> input and capitalize(input) != "QUIT")
     {
         if (input == "QUIT")
@@ -15,11 +37,7 @@ void Calculator::run(istream& is)
         else if (input == "PRINT")
             print(is);
         else
-            // Handle anything else.
-        {
-            buildTree(input, is);
-            cout << "Not yet implemented: " << input << endl;
-        };
+            parseTree(input, is);
 
     }
 };
@@ -40,6 +58,7 @@ void Calculator::print(istream& is) const
 
 string& Calculator::capitalize(string& s) const
 {
+    //TODO - What happens if s contains numbers?
     transform(s.begin(), s.end(), s.begin(), 
               [](unsigned char c) // We use unsigned char here because
                                   // std::toupper has undefined behaviour for
@@ -50,18 +69,13 @@ string& Calculator::capitalize(string& s) const
     return s;
 };
 
-void Calculator::buildTree(string const& affected_reg, istream& is)
+void Calculator::parseTree(string const& affected_reg, istream& is)
 {
     string operatorStr, operandStr;
     is >> operatorStr >> operandStr;
-    // TODO - Start here next time.
     // Figure out if operandStr is a number or register.
     // If it is a number, simply create a nptr to a value node of that number.
     // If it is a register:
     //     Check if it already exists in regs, in that case, 
 
-    if (capitalize(operatorStr) == "ADD")
-    {
-        return;
-    }
 };

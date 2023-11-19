@@ -14,6 +14,6 @@ private:
     std::unordered_map<std::string, nptr> regs;
     void print(std::istream&) const; 
     std::string& capitalize(std::string&) const;
-    void buildTree(std::string const&, std::istream&);
+    void parseTree(std::string const&, std::istream&);
 };
 
