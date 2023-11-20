@@ -9,20 +9,20 @@ for a masters thesis.
     <li>It should be possible to use a map to keep track of which nodes are
     "registers".</li>
     <li>I am worried about circular definitions, for example, what happens here?
-    <ol>
-        <li>A add B</li>
-        <li>B add A</li>
-        <li>A add 1</li>
-        <li>print A</li>
-    </ol>
+            A add B
+            B add A
+            A add 1
+            print A
     </li>
 </ul>
 
 ## Thoughts during development
 
 Due to part of the instructions given by Sectra
+
 > Any name consisting of alphanumeric characters should be allower as register
 > names
+
 there might be some undefined behaviour if we chose a registry name which is
 purely numerical, such as "123". What would, for example
     
