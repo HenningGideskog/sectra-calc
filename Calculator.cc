@@ -3,18 +3,14 @@
 #include <stdexcept>
 #include <algorithm>
 
-using namespace std;
+// TODO - Start here
+//        Re-work parsing to be more robust. Also write function to convert
+//        string to an appropriate Nptr.
+//
+//        Should also re-work capitalize somehow. It is a little hard to see and
+//        un-intuitive what it does. Maybe...
 
-// Note - "Any name consisting of alphanumeric characters should be allowed as
-// register names" in instructions given by Sectra causes undefined behaviour.
-// What happens below?
-//
-//      123 add 5
-//      123 add 123
-//      print 123
-//
-// Does it print 10? 128? Should it just crash because of circular dependency 
-// for register 123? 
+using namespace std;
 
 void Calculator::run(istream& is)
 {
@@ -22,14 +18,17 @@ void Calculator::run(istream& is)
     double numInput{};
 
     // TODO - Is this really a good way to check eof?
+    //        Probably not, since stuff below ruins it.
     while (not is.eof())
     {
         // TODO - Is this really the best way to check if the register name is
         // allowed or not?
+        // No. Should be able to use dynamic casting with conversion function
+        // from string (or inputstream) to Nptr.
         if (is >> numInput)
         {
-            throw runtime_error("Registers are not allowed to start with \
-                                 numeric characters.");
+            throw runtime_error("Registers are not allowed to start with"
+                                "numeric characters.");
         }
         else
         {
@@ -46,7 +45,7 @@ void Calculator::run(istream& is)
         }
         else
         {
-            parseRegisterOperation(is, strInput);
+            parseTree(strInput, is);
         }
     }
 };
@@ -56,18 +55,17 @@ void Calculator::print(istream& is) const
     // TODO - What happens here if is is EOF?
     // TODO - Think about tests for errors here.
     string toPrint{};
+    is >> toPrint;
 
     // TODO - Message does not always match error reason.
-    if (not (is >> toPrint) or not regs.contains(toPrint))
+    if (not regs.contains(capitalize(toPrint)))
         throw runtime_error("Tried to print register which does not exist.");
     else
-        // TODO - Will just print the nptr for now.
-        cout << regs.at(toPrint) << endl;
+        regs.at(toPrint)->print(cout);
 };
 
 string& Calculator::capitalize(string& s) const
 {
-    //TODO - What happens if s contains numbers?
     transform(s.begin(), s.end(), s.begin(), 
               [](unsigned char c) // We use unsigned char here because
                                   // std::toupper has undefined behaviour for
@@ -81,39 +79,40 @@ string& Calculator::capitalize(string& s) const
 void Calculator::parseTree(string const& affected_reg, istream& is)
 {
     string operatorStr{};
-    string operandStr{};
+
+    // TODO - This should work for strings too!
+    double operandStr{};
     is >> operatorStr >> operandStr;
 
+    // TODO - Is this a good check?
     if (not is.good())
         throw runtime_error("Parsing input failed due to bad input.");
     
     if (not regs.contains(affected_reg))
     {
-        // TODO - Start here next time.
-        // Do I abandon smart pointers for regular ones here?
-        regs[affected_reg] = new Value(0);
+        // Initialize new registers to 0.
+        regs[affected_reg] = make_shared<Value>(0);
     }
-
-    else if (capitalize(operatorStr) == "ADD")
+    
+    if (capitalize(operatorStr) == "ADD")
     {
-        
+        Nptr tmp{make_shared<Value>(operandStr)};
+        regs[affected_reg] = make_shared<Addition>(regs[affected_reg], tmp);
     }
     else if (operatorStr == "SUBTRACT")
     {
-
+        Nptr tmp{make_shared<Value>(operandStr)};
+        regs[affected_reg] = make_shared<Subtraction>(regs[affected_reg], tmp);
     }
     else if (operatorStr == "MULTIPLY")
     {
-
+        Nptr tmp{make_shared<Value>(operandStr)};
+        regs[affected_reg] = make_shared<Multiplication>(regs[affected_reg], 
+                                                         tmp);
     }
     else
     {
         // TODO - Check that this works.
-        throw runtime_error("Unknown operator: " + operatorStr)
+        throw runtime_error("Unknown operator: " + operatorStr);
     }
-    // Figure out if operandStr is a number or register.
-    // If it is a number, simply create a nptr to a value node of that number.
-    // If it is a register:
-    //     Check if it already exists in regs, in that case, 
-
 };

@@ -4,45 +4,50 @@
 
 
 struct Node;
-using nptr = std::shared_ptr<Node>;
+using Nptr = std::shared_ptr<Node>;
 
 struct Node
 {
     virtual ~Node() = default;
     virtual void print(std::ostream&) const = 0;
+    virtual double evaluate() const = 0;
 };
 
-struct Register : public Node
+struct Value : Node
 {
-    Register(); 
-    ~Register() override;
+    Value(double const d);
     void print(std::ostream&) const override;
-
+    virtual double evaluate() const override;
 private:
-    nptr next;
+    double val;
 };
 
 struct Operator : public Node
 {
     virtual ~Operator() = default;
+    Operator(Nptr const&, Nptr const&);
+    void print(std::ostream&) const override;
 
 protected:
-    nptr lhs; // lhs - Left hand side.
-    nptr rhs; // rhs - Right hand side.
+    Nptr lhs; // lhs - Left hand side.
+    Nptr rhs; // rhs - Right hand side.
 };
 
 struct Addition : public Operator
 {
-    Addition();
+    Addition(Nptr const&, Nptr const&);
+    double evaluate() const override;
 };
 
 struct Subtraction : public Operator
 {
-    Subtraction();
+    Subtraction(Nptr const&, Nptr const&);
+    double evaluate() const override;
 };
 
 struct Multiplication : public Operator
 {
-    Multiplication();
+    Multiplication(Nptr const&, Nptr const&);
+    double evaluate() const override;
 };
 
