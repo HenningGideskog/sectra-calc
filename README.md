@@ -17,3 +17,19 @@ for a masters thesis.
     </ol>
     </li>
 </ul>
+
+## Thoughts during development
+
+Due to part of the instructions given by Sectra
+> Any name consisting of alphanumeric characters should be allower as register
+> names
+there might be some undefined behaviour if we chose a registry name which is
+purely numerical, such as "123". What would, for example
+    
+    123 add 5
+    123 add 123
+    print 123
+
+print? One could argue that perhaps an alphanumerical string needs to include
+<em>both</em> letters and numbers, in which case it is not an issue. My 
+implementation will only allow register names starting with a letter.
