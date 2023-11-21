@@ -2,6 +2,7 @@
 #include <string>
 #include <stdexcept>
 #include <algorithm>
+#include <cmath>
 
 // TODO - Start here
 //        Re-work parsing to be more robust. Also write function to convert
@@ -83,7 +84,6 @@ void Calculator::parseTree(string const& affected_reg, istream& is)
     }
 
     capitalize(operatorStr);
-    capitalize(operandStr);
     
     Nptr operandNode{getNptr(operandStr)};
     
@@ -108,17 +108,39 @@ void Calculator::parseTree(string const& affected_reg, istream& is)
     }
 };
 
-Nptr Calculator::getNptr(string const& NodeID) const
+Nptr Calculator::getNptr(string const& nodeStr) const
 {
+    double value{strToDouble(nodeStr)};
+
+    if (value == NAN)
+    {
+        cout << "Value is NAN" << endl;
+        return nullptr;
+    }
+    else
+    {
+        cout << "Value is not NAN" << endl;
+        return nullptr;
+    }
+};
+
+double Calculator::strToDouble(string const& s) const
+{
+    double d{};
+    size_t nConvChar{};
+
     try
     {
-        double literalVal{stod(NodeID)};
+        d = stod(s, &nConvChar);
     }
-    catch(invalid_argument)
+    catch (invalid_argument)
     {
-        cout << "Invalid conversion" << endl;
+        d = NAN;
     }
-
-    return nullptr;
+    
+    if (nConvChar != s.length())
+        return NAN;
+    else
+        return d;
 
 };
