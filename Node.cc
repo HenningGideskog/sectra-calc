@@ -2,16 +2,20 @@
 
 using namespace std;
 
-Value::Value(double const d)
+Register::Register(Nptr const& nptr)
+    : next{nptr}
+{};
+
+double Register::evaluate() const
+{
+    return next->evaluate();
+};
+
+Number::Number(double const d)
     : Node{}, val{d}
 {};
 
-void Value::print(ostream& os) const
-{
-    os << val << endl;
-};
-
-double Value::evaluate() const
+double Number::evaluate() const
 {
     return val;
 };
@@ -19,11 +23,6 @@ double Value::evaluate() const
 Operator::Operator(Nptr const& l, Nptr const& r)
     : lhs{l}, rhs{r}
 {};
-
-void Operator::print(ostream& os) const
-{
-    os << evaluate() << endl;
-};
 
 Addition::Addition(Nptr const& l, Nptr const& r)
     : Operator{l, r}
@@ -52,3 +51,7 @@ double Multiplication::evaluate() const
     return lhs->evaluate() * rhs->evaluate();
 };
 
+ostream& operator<<(ostream& os, Nptr nptr)
+{
+    return (os << nptr->evaluate());
+};

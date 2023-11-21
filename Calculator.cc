@@ -61,7 +61,7 @@ void Calculator::print(istream& is) const
     if (not regs.contains(capitalize(toPrint)))
         throw runtime_error("Tried to print register which does not exist.");
     else
-        regs.at(toPrint)->print(cout);
+        cout << regs.at(toPrint) << endl;
 };
 
 string& Calculator::capitalize(string& s) const
@@ -91,22 +91,22 @@ void Calculator::parseTree(string const& affected_reg, istream& is)
     if (not regs.contains(affected_reg))
     {
         // Initialize new registers to 0.
-        regs[affected_reg] = make_shared<Value>(0);
+        regs[affected_reg] = make_shared<Number>(0);
     }
     
     if (capitalize(operatorStr) == "ADD")
     {
-        Nptr tmp{make_shared<Value>(operandStr)};
+        Nptr tmp{make_shared<Number>(operandStr)};
         regs[affected_reg] = make_shared<Addition>(regs[affected_reg], tmp);
     }
     else if (operatorStr == "SUBTRACT")
     {
-        Nptr tmp{make_shared<Value>(operandStr)};
+        Nptr tmp{make_shared<Number>(operandStr)};
         regs[affected_reg] = make_shared<Subtraction>(regs[affected_reg], tmp);
     }
     else if (operatorStr == "MULTIPLY")
     {
-        Nptr tmp{make_shared<Value>(operandStr)};
+        Nptr tmp{make_shared<Number>(operandStr)};
         regs[affected_reg] = make_shared<Multiplication>(regs[affected_reg], 
                                                          tmp);
     }

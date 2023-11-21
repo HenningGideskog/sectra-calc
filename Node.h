@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
-#include <ostream>
+#include <iostream>
+
 
 
 struct Node;
@@ -9,14 +10,20 @@ using Nptr = std::shared_ptr<Node>;
 struct Node
 {
     virtual ~Node() = default;
-    virtual void print(std::ostream&) const = 0;
     virtual double evaluate() const = 0;
 };
 
-struct Value : Node
+struct Register : public Node
 {
-    Value(double const d);
-    void print(std::ostream&) const override;
+    Register(Nptr const&);
+    virtual double evaluate() const override;
+private:
+    Nptr next;
+};
+
+struct Number : Node
+{
+    Number(double const d);
     virtual double evaluate() const override;
 private:
     double val;
@@ -26,7 +33,6 @@ struct Operator : public Node
 {
     virtual ~Operator() = default;
     Operator(Nptr const&, Nptr const&);
-    void print(std::ostream&) const override;
 
 protected:
     Nptr lhs; // lhs - Left hand side.
@@ -51,3 +57,4 @@ struct Multiplication : public Operator
     double evaluate() const override;
 };
 
+std::ostream& operator<<(std::ostream&, Nptr);
