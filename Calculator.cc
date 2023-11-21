@@ -15,53 +15,42 @@ using namespace std;
 void Calculator::run(istream& is)
 {
     string strInput{};
-    double numInput{};
 
-    // TODO - Is this really a good way to check eof?
-    //        Probably not, since stuff below ruins it.
-    while (not is.eof())
+    while (is >> strInput)
     {
-        // TODO - Is this really the best way to check if the register name is
-        // allowed or not?
-        // No. Should be able to use dynamic casting with conversion function
-        // from string (or inputstream) to Nptr.
-        if (is >> numInput)
-        {
-            throw runtime_error("Registers are not allowed to start with"
-                                "numeric characters.");
-        }
-        else
-        {
-            is.clear();
-        }
-
-        if (is >> strInput and capitalize(strInput) == "PRINT")
-        {
-            print(is);
-        }
-        else if (strInput == "QUIT")
-        {
+        if (is.eof())
             return;
-        }
         else
-        {
+            capitalize(strInput);
+
+        if (strInput == "PRINT")
+            print(is);
+
+        else if (strInput == "QUIT")
+            return;
+
+        else
             parseTree(strInput, is);
-        }
     }
 };
 
 void Calculator::print(istream& is) const
 {
-    // TODO - What happens here if is is EOF?
     // TODO - Think about tests for errors here.
     string toPrint{};
     is >> toPrint;
 
-    // TODO - Message does not always match error reason.
-    if (not regs.contains(capitalize(toPrint)))
-        throw runtime_error("Tried to print register which does not exist.");
-    else
-        cout << regs.at(toPrint) << endl;
+    if (is.fail())
+        throw runtime_error("Print failed due to bad input.");
+    else if (is.eof())
+    {
+        // Graceful exit, will exit entire program due to condition in run.
+        cout << "Reached EOF. Exiting..." << endl;
+        return;
+    }
+
+    capitalize(toPrint);
+    cout << getNptr(toPrint) << endl;
 };
 
 string& Calculator::capitalize(string& s) const
@@ -79,40 +68,57 @@ string& Calculator::capitalize(string& s) const
 void Calculator::parseTree(string const& affected_reg, istream& is)
 {
     string operatorStr{};
+    string operandStr{};
 
-    // TODO - This should work for strings too!
-    double operandStr{};
     is >> operatorStr >> operandStr;
 
-    // TODO - Is this a good check?
-    if (not is.good())
-        throw runtime_error("Parsing input failed due to bad input.");
-    
-    if (not regs.contains(affected_reg))
+    // TODO - Code duplication in print.
+    if (is.fail())
+        throw runtime_error("Parsing failed due to bad input.");
+    else if (is.eof())
     {
-        // Initialize new registers to 0.
-        regs[affected_reg] = make_shared<Number>(0);
+        // Graceful exit, will exit entire program due to condition in run.
+        cout << "Reached EOF. Exiting..." << endl;
+        return;
     }
+
+    capitalize(operatorStr);
+    capitalize(operandStr);
+    
+    Nptr operandNode{getNptr(operandStr)};
     
     if (capitalize(operatorStr) == "ADD")
     {
-        Nptr tmp{make_shared<Number>(operandStr)};
-        regs[affected_reg] = make_shared<Addition>(regs[affected_reg], tmp);
+        regs[affected_reg] = make_shared<Addition>(regs[affected_reg],
+                                                   operandNode);
     }
     else if (operatorStr == "SUBTRACT")
     {
-        Nptr tmp{make_shared<Number>(operandStr)};
-        regs[affected_reg] = make_shared<Subtraction>(regs[affected_reg], tmp);
+        regs[affected_reg] = make_shared<Subtraction>(regs[affected_reg],
+                                                   operandNode);
     }
     else if (operatorStr == "MULTIPLY")
     {
-        Nptr tmp{make_shared<Number>(operandStr)};
-        regs[affected_reg] = make_shared<Multiplication>(regs[affected_reg], 
-                                                         tmp);
+        regs[affected_reg] = make_shared<Multiplication>(regs[affected_reg],
+                                                   operandNode);
     }
     else
     {
-        // TODO - Check that this works.
         throw runtime_error("Unknown operator: " + operatorStr);
     }
+};
+
+Nptr Calculator::getNptr(string const& NodeID) const
+{
+    try
+    {
+        double literalVal{stod(NodeID)};
+    }
+    catch(invalid_argument)
+    {
+        cout << "Invalid conversion" << endl;
+    }
+
+    return nullptr;
+
 };

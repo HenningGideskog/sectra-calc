@@ -15,5 +15,6 @@ private:
     void print(std::istream&) const; 
     std::string& capitalize(std::string&) const;
     void parseTree(std::string const&, std::istream&);
+    Nptr getNptr(std::string const&) const;
 };
 
