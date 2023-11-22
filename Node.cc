@@ -2,6 +2,10 @@
 
 using namespace std;
 
+Register::Register()
+    : next{make_shared<Number>(0)}
+{};
+
 Register::Register(Nptr const& nptr)
     : next{nptr}
 {};
@@ -11,8 +15,23 @@ double Register::evaluate() const
     return next->evaluate();
 };
 
+void Register::add(Nptr const& nodeToAdd)
+{
+    next = make_shared<Addition>(next, nodeToAdd);
+};
+
+void Register::subtract(Nptr const& nodeToSubtract)
+{
+    next = make_shared<Subtraction>(next, nodeToSubtract);
+};
+
+void Register::multiply(Nptr const& nodeToMultiplyBy)
+{
+    next = make_shared<Multiplication>(next, nodeToMultiplyBy);
+};
+
 Number::Number(double const d)
-    : Node{}, val{d}
+    : val{d}
 {};
 
 double Number::evaluate() const

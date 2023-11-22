@@ -11,11 +11,13 @@ struct Calculator
 
 private:
     // HINT - Nptr = std::shared_ptr<Node>
-    std::unordered_map<std::string, Nptr> regs;
-    void print(std::istream&) const; 
+    std::unordered_map<std::string, std::shared_ptr<Register>> regs;
+    void print(std::istream&);
     std::string& capitalize(std::string&) const;
     void parseTree(std::string const&, std::istream&);
-    Nptr getNptr(std::string const&) const;
-    double strToDouble(std::string const&) const;
+    Nptr getNptr(std::string const&);
+    bool isNumber(std::string const&) const;
 };
 
+// TODO - Maybe overload operator>> to always capitalize strings?
+//        This is probably a bad idea...

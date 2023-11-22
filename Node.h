@@ -15,9 +15,12 @@ struct Node
 
 struct Register : public Node
 {
+    Register();
     Register(Nptr const&);
     virtual double evaluate() const override;
-private:
+    void add(Nptr const&);
+    void subtract(Nptr const&);
+    void multiply(Nptr const&);
     Nptr next;
 };
 

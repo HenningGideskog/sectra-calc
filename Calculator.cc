@@ -4,13 +4,6 @@
 #include <algorithm>
 #include <cmath>
 
-// TODO - Start here
-//        Re-work parsing to be more robust. Also write function to convert
-//        string to an appropriate Nptr.
-//
-//        Should also re-work capitalize somehow. It is a little hard to see and
-//        un-intuitive what it does. Maybe...
-
 using namespace std;
 
 void Calculator::run(istream& is)
@@ -19,39 +12,86 @@ void Calculator::run(istream& is)
 
     while (is >> strInput)
     {
+        capitalize(strInput);
+
         if (is.eof())
+            // TODO - Does this actually ever happen or does the while condition
+            // fail above?
             return;
-        else
-            capitalize(strInput);
 
         if (strInput == "PRINT")
             print(is);
-
         else if (strInput == "QUIT")
             return;
-
         else
             parseTree(strInput, is);
     }
 };
 
-void Calculator::print(istream& is) const
+void Calculator::print(istream& is)
 {
     // TODO - Think about tests for errors here.
     string toPrint{};
-    is >> toPrint;
-
-    if (is.fail())
-        throw runtime_error("Print failed due to bad input.");
+    if (is >> toPrint)
+    {
+        capitalize(toPrint);
+        cout << getNptr(toPrint) << endl;
+    }
     else if (is.eof())
     {
-        // Graceful exit, will exit entire program due to condition in run.
-        cout << "Reached EOF. Exiting..." << endl;
+        cerr << "Unexpected EOF. Exiting..." << endl;
         return;
     }
+    else
+        throw runtime_error("Print failed due to bad input.");
+};
 
-    capitalize(toPrint);
-    cout << getNptr(toPrint) << endl;
+
+void Calculator::parseTree(string const& affectedReg, istream& is)
+{
+    Nptr affectedNode{getNptr(affectedReg)};
+
+    string operatorStr{};
+    string operandStr{};
+
+    if (is >> operatorStr >> operandStr)
+    {
+        capitalize(operatorStr);
+        capitalize(operandStr);
+        cout << "Parsing " << affectedReg << " " << operatorStr << " "
+             << operandStr << endl;
+    }
+    else if (is.eof())
+    {
+        cerr << "Unexpected EOF. Exiting..." << endl;
+        return;
+    }
+    else
+        throw runtime_error("Parsing failed due to bad input.");
+
+    Nptr operandNode{getNptr(operandStr)};
+    
+    if (operatorStr == "ADD")
+        regs[affectedReg]->add(operandNode);
+    else if (operatorStr == "SUBTRACT")
+        regs[affectedReg]->subtract(operandNode);
+    else if (operatorStr == "MULTIPLY")
+        regs[affectedReg]->multiply(operandNode);
+    else
+        throw runtime_error("Unknown operator: " + operatorStr);
+};
+
+Nptr Calculator::getNptr(string const& nodeStr)
+{
+    if (isNumber(nodeStr))
+    {
+        // TODO - How will this handle 100. or .100?
+        return make_shared<Number>(stod(nodeStr));
+    }
+    else if (not regs.contains(nodeStr))
+        regs[nodeStr] = make_shared<Register>();
+
+    return regs[nodeStr];
 };
 
 string& Calculator::capitalize(string& s) const
@@ -66,81 +106,18 @@ string& Calculator::capitalize(string& s) const
     return s;
 };
 
-void Calculator::parseTree(string const& affected_reg, istream& is)
+bool Calculator::isNumber(string const& str) const
 {
-    string operatorStr{};
-    string operandStr{};
+    // Check if the ENTIRE str can be enterpreted as a double. 
+    unsigned counter{};
 
-    is >> operatorStr >> operandStr;
-
-    // TODO - Code duplication in print.
-    if (is.fail())
-        throw runtime_error("Parsing failed due to bad input.");
-    else if (is.eof())
+    for (char const& c : str)
     {
-        // Graceful exit, will exit entire program due to condition in run.
-        cout << "Reached EOF. Exiting..." << endl;
-        return;
+        if ((c == ',' or c == '.') and ++counter < 2) 
+            continue;
+        else if (c < '0' or c > '9') 
+            return false;
     }
 
-    capitalize(operatorStr);
-    
-    Nptr operandNode{getNptr(operandStr)};
-    
-    if (capitalize(operatorStr) == "ADD")
-    {
-        regs[affected_reg] = make_shared<Addition>(regs[affected_reg],
-                                                   operandNode);
-    }
-    else if (operatorStr == "SUBTRACT")
-    {
-        regs[affected_reg] = make_shared<Subtraction>(regs[affected_reg],
-                                                   operandNode);
-    }
-    else if (operatorStr == "MULTIPLY")
-    {
-        regs[affected_reg] = make_shared<Multiplication>(regs[affected_reg],
-                                                   operandNode);
-    }
-    else
-    {
-        throw runtime_error("Unknown operator: " + operatorStr);
-    }
-};
-
-Nptr Calculator::getNptr(string const& nodeStr) const
-{
-    double value{strToDouble(nodeStr)};
-
-    if (value == NAN)
-    {
-        cout << "Value is NAN" << endl;
-        return nullptr;
-    }
-    else
-    {
-        cout << "Value is not NAN" << endl;
-        return nullptr;
-    }
-};
-
-double Calculator::strToDouble(string const& s) const
-{
-    double d{};
-    size_t nConvChar{};
-
-    try
-    {
-        d = stod(s, &nConvChar);
-    }
-    catch (invalid_argument)
-    {
-        d = NAN;
-    }
-    
-    if (nConvChar != s.length())
-        return NAN;
-    else
-        return d;
-
+    return true;
 };
