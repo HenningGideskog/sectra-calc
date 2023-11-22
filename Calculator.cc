@@ -58,8 +58,6 @@ void Calculator::parseTree(string const& affectedReg, istream& is)
     {
         capitalize(operatorStr);
         capitalize(operandStr);
-        cout << "Parsing " << affectedReg << " " << operatorStr << " "
-             << operandStr << endl;
     }
     else if (is.eof())
     {
