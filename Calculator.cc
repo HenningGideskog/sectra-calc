@@ -14,11 +14,6 @@ void Calculator::run(istream& is)
     {
         capitalize(strInput);
 
-        if (is.eof())
-            // TODO - Does this actually ever happen or does the while condition
-            // fail above?
-            return;
-
         if (strInput == "PRINT")
             print(is);
         else if (strInput == "QUIT")
@@ -26,11 +21,14 @@ void Calculator::run(istream& is)
         else
             parseTree(strInput, is);
     }
+    
+    if (is.bad())
+        throw runtime_error("ERROR: Reading from input failed.");
+
 };
 
 void Calculator::print(istream& is)
 {
-    // TODO - Think about tests for errors here.
     string toPrint{};
     if (is >> toPrint)
     {
@@ -38,12 +36,7 @@ void Calculator::print(istream& is)
         cout << getNptr(toPrint) << endl;
     }
     else if (is.eof())
-    {
         cerr << "Unexpected EOF. Exiting..." << endl;
-        return;
-    }
-    else
-        throw runtime_error("Print failed due to bad input.");
 };
 
 
