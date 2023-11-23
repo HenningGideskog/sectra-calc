@@ -16,5 +16,6 @@ private:
     std::string& capitalize(std::string&) const;
     void parseTree(std::string const&, std::istream&);
     Nptr getNptr(std::string const&);
+    std::shared_ptr<Register> getRegPtr(std::string const&);
     bool isNumber(std::string const&) const;
 };

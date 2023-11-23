@@ -2,7 +2,6 @@
 #include <string>
 #include <stdexcept>
 #include <algorithm>
-#include <cmath>
 
 using namespace std;
 
@@ -44,7 +43,7 @@ void Calculator::print(istream& is)
 
 void Calculator::parseTree(string const& affectedReg, istream& is)
 {
-    Nptr affectedNode{getNptr(affectedReg)};
+    Nptr affectedNode{getRegPtr(affectedReg)};
 
     string operatorStr{};
     string operandStr{};
@@ -73,10 +72,17 @@ Nptr Calculator::getNptr(string const& nodeStr)
 {
     if (isNumber(nodeStr))
         return make_shared<Number>(stod(nodeStr));
-    else if (not regs.contains(nodeStr))
-        regs[nodeStr] = make_shared<Register>();
 
-    return regs[nodeStr];
+    return getRegPtr(nodeStr);
+};
+
+shared_ptr<Register> Calculator::getRegPtr(string const& regStr)
+{
+    if (isNumber(regStr))
+        throw runtime_error("ERROR: Pure numeric register name not allowed.");
+    else if (not regs.contains(regStr))
+        regs[regStr] = make_shared<Register>();
+    return regs[regStr];
 };
 
 string& Calculator::capitalize(string& s) const
