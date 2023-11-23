@@ -1,7 +1,7 @@
 # Makefile for simple C++ project
 
 CXX = g++  # Compiler
-CXXFLAGS = -std=c++20 -Wall  # Compiler flags
+CXXFLAGS = -std=c++20 -Wall -Wextra -Wpedantic -static # Compiler flags
 SRC = main.cc Node.cc Calculator.cc  # Source files
 TARGET = run  # Executable name
 
