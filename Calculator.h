@@ -18,6 +18,3 @@ private:
     Nptr getNptr(std::string const&);
     bool isNumber(std::string const&) const;
 };
-
-// TODO - Maybe overload operator>> to always capitalize strings?
-//        This is probably a bad idea...
