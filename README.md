@@ -49,8 +49,9 @@ Sectra. The issue is that
     A multiply B
     A add 1
     B add 5
+    print A
 
-will evaluate to 1, rather than 5. This is because the first line initializes A
+will print 1, rather than 5. This is because the first line initializes A
 as 0, which is then multiplied by B. Now, because the order of operations given
 the input is defined as (A * B) + 1, it does not matter that B is later set to
 5. This could perhaps be solved, but I am not sure how to do that without
